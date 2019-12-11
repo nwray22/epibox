@@ -24,12 +24,13 @@ epibox.login=async function(){
             location.href=location.origin+location.pathname
         }else{
             delete localStorage.epiboxtoken
+            alert('logged in')
         }
     }
 }
 
 epibox.getOauth=function(uri=location.origin){
-    console.log(`oauth for ${location.origin}`)
+    //console.log(`oauth for ${location.origin}`)
     switch(uri){
         case 'http://localhost:8000':
             epibox.oauth={
