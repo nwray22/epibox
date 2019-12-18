@@ -27,8 +27,29 @@ epibox.login=async function(){
             //delete localStorage.epiboxtoken
             //alert('logged in')
             epibox.msg(`> logged in session started at ${new Date(epibox.oauth.token.created_at)}`,'green')
+            // is this a stale session?
+            if(Date.now()-(epibox.oauth.token.created_at+epibox.oauth.token.expires_in*1000)>0){
+                console.log('stale session, refreshing it')
+                //delete localStorage.epiboxtoken
+                epibox.refreshToken()
+            }
+            else{
+                epibox.oauth.t=setInterval(epibox.refreshToken,parseInt(epibox.oauth.token.expires_in*900)) // refresh when 90% of the validity is gone        
+            }
         }
     }
+            
+}
+
+epibox.refreshToken=async function(){
+    console.log('refreshing token at '+Date())
+    epibox.oauth.token = await (await fetch('https://api.box.com/oauth2/token',{
+        method:"POST",
+        body:`grant_type=refresh_token&refresh_token=${epibox.oauth.token.refresh_token}&client_id=${epibox.oauth.client_id}&client_secret=${epibox.oauth.secret}`
+    })).json()
+    epibox.oauth.token.created_at=Date.now()
+    localStorage.epiboxtoken=JSON.stringify(epibox.oauth.token)
+    return `session refreshed at ${new Date(epibox.oauth.token.created_at)}`
 }
 
 epibox.getOauth=function(uri=location.origin){
@@ -47,7 +68,8 @@ epibox.getOauth=function(uri=location.origin){
             }
             break
         default:
-            Error(`no auth found for ${location.origin}`)
+            epibox.msg(`> no auth found for ${location.origin}`,'red')
+            //Error(`no auth found for ${location.origin}`)
     }
 }
 
