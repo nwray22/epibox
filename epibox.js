@@ -35,7 +35,7 @@ epibox.login=async function(){
 }
 
 epibox.refreshToken=async function(){
-    console.log('refreshing token at '+Date())
+    epibox.msg('refreshing token ...')
     let token = await (await fetch('https://api.box.com/oauth2/token',{
         method:"POST",
         body:`grant_type=refresh_token&refresh_token=${epibox.oauth.token.refresh_token}&client_id=${epibox.oauth.client_id}&client_secret=${epibox.oauth.client_secret}`
@@ -46,7 +46,9 @@ epibox.refreshToken=async function(){
     token.client_secret=epibox.oauth.client_secret
     epibox.oauth.token=token
     localStorage.epiboxtoken=JSON.stringify(epibox.oauth.token)
-    return `session refreshed at ${new Date(epibox.oauth.token.created_at)}`
+    const msg = `session refreshed at ${new Date(epibox.oauth.token.created_at)}`
+    epibox.msg(msg)
+    return msg
 }
 
 epibox.getOauth=function(uri=location.origin){
