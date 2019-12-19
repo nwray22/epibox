@@ -29,15 +29,6 @@ epibox.login=async function(){
             //delete localStorage.epiboxtoken
             //alert('logged in')
             epibox.msg(`> logged in session started at ${new Date(epibox.oauth.token.created_at)}`,'green')
-            // is this a stale session?
-            if(Date.now()-(epibox.oauth.token.created_at+epibox.oauth.token.expires_in*1000)>0){
-                console.log('stale session, refreshing it')
-                //delete localStorage.epiboxtoken
-                epibox.refreshToken()
-            }
-            else{
-                epibox.oauth.t=setInterval(epibox.refreshToken,parseInt(epibox.oauth.token.expires_in*900)) // refresh when 90% of the validity is gone        
-            }
         }
     }
             
@@ -76,6 +67,27 @@ epibox.getOauth=function(uri=location.origin){
         default:
             epibox.msg(`> no auth found for ${location.origin}`,'red')
             //Error(`no auth found for ${location.origin}`)
+    }
+}
+
+epibox.checkToken= async function(){ // check token, refresh if needed
+    if(!epibox.oauth){ // this is being used from a non epbox context
+        let token = JSON.parse(localStorage.epiboxtoken)
+        if(!token){
+            epibox.msg(`> you don't have an active epibox session, please <a href="${location.origin}/epibox" target="_blank">start one here</a>.`,'red')
+        }else{
+            epibox.oauth={
+                client_id:token.client_id,
+                client_secret:token.client_secret,
+                token:token
+            }
+            epibox.msg('> epibox session refreshed at '+Date())
+        }
+            
+    }
+    if(Date.now()-(epibox.oauth.token.created_at+epibox.oauth.token.expires_in*1000)>0){
+        epibox.msg('> session extended, bearer token refreshed at '+Date())
+        epibox.refreshToken()
     }
 }
 
