@@ -13,9 +13,11 @@ epibox.login=async function(){
     if(epibox.parms.code){ // dance first step taken
         epibox.oauth.token = await (await fetch('https://api.box.com/oauth2/token',{
             method:"POST",
-            body:`grant_type=authorization_code&code=${epibox.parms.code}&client_id=${epibox.oauth.client_id}&client_secret=${epibox.oauth.secret}`
+            body:`grant_type=authorization_code&code=${epibox.parms.code}&client_id=${epibox.oauth.client_id}&client_secret=${epibox.oauth.client_secret}`
         })).json()
-        epibox.oauth.token.created_at=Date.now()
+        epibox.oauth.token.initiated_at=epibox.oauth.token.created_at=Date.now()
+        epibox.oauth.token.client_id=epibox.oauth.client_id
+        epibox.oauth.token.client_secret=epibox.oauth.client_secret
     }
     if(!epibox.oauth.token){ // start dance
         location.href=`https://account.box.com/api/oauth2/authorize?client_id=${epibox.oauth.client_id}&response_type=code&redirect_uri=${location.origin+location.pathname}`
@@ -43,11 +45,15 @@ epibox.login=async function(){
 
 epibox.refreshToken=async function(){
     console.log('refreshing token at '+Date())
-    epibox.oauth.token = await (await fetch('https://api.box.com/oauth2/token',{
+    let token = await (await fetch('https://api.box.com/oauth2/token',{
         method:"POST",
-        body:`grant_type=refresh_token&refresh_token=${epibox.oauth.token.refresh_token}&client_id=${epibox.oauth.client_id}&client_secret=${epibox.oauth.secret}`
+        body:`grant_type=refresh_token&refresh_token=${epibox.oauth.token.refresh_token}&client_id=${epibox.oauth.client_id}&client_secret=${epibox.oauth.client_secret}`
     })).json()
-    epibox.oauth.token.created_at=Date.now()
+    token.created_at=Date.now()
+    token.initiated_at=epibox.oauth.token.initiated_at
+    token.client_id=epibox.oauth.client_id
+    token.client_secret=epibox.oauth.client_secret
+    epibox.oauth.token=token
     localStorage.epiboxtoken=JSON.stringify(epibox.oauth.token)
     return `session refreshed at ${new Date(epibox.oauth.token.created_at)}`
 }
@@ -58,13 +64,13 @@ epibox.getOauth=function(uri=location.origin){
         case 'http://localhost:8000':
             epibox.oauth={
                 client_id:'52zad6jrv5v52mn1hfy1vsjtr9jn5o1w',
-                secret:'2rHTqzJumz8s9bAjmKMV83WHX1ooN4kT'
+                client_secret:'2rHTqzJumz8s9bAjmKMV83WHX1ooN4kT'
             }
             break
         case 'https://episphere.github.io':
             epibox.oauth={
                 client_id:'1n44fu5yu1l547f2n2fgcw7vhps7kvuw',
-                secret:'2ZYzmHXGyzBcjZ9d1Ttsc1d258LiGGVd'
+                client_secret:'2ZYzmHXGyzBcjZ9d1Ttsc1d258LiGGVd'
             }
             break
         default:
