@@ -106,7 +106,7 @@ epibox.readParms=function(str=location.search){ // by default reads search only,
 
 epibox.msg=function(hm,color="blue",dt=20){
     console.log(hm)
-    let msg = document.getElementById('msg')
+    let msg = document.getElementById('epibox_msg')
     if(msg){
         msg.style.color=color
         msg.innerHTML=''
