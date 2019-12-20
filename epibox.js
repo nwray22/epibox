@@ -3,11 +3,12 @@ console.log('epibox.js loaded')
 epibox=async function(){
     console.log(`epibox ini at ${Date()}`)
     epibox.readParms()
-    epibox.getOauth()
+    //epibox.getOauth()
     epibox.login()
 }
 
 epibox.login=async function(){
+    epibox.getOauth()
     // look for token infoin localStorage
     if(localStorage.epiboxtoken){epibox.oauth.token=JSON.parse(localStorage.epiboxtoken)} // remove if localStorage persistence undesirable
     if(epibox.parms.code){ // dance first step taken
@@ -28,21 +29,23 @@ epibox.login=async function(){
         }else{
             //delete localStorage.epiboxtoken
             //alert('logged in')
-            epibox.msg(`> logged in session started at ${new Date(epibox.oauth.token.created_at)}`,'green')
+            epibox.msg(`> logged in session last updated at ${new Date(epibox.oauth.token.created_at)}`,'green')
         }
     }
             
 }
 
 epibox.logout=async function(){
-    await fetch('https://api.box.com/oauth2/revoke',{
+    let res = fetch('https://api.box.com/oauth2/revoke',{
         method:"POST",
         mode:"no-cors",
         body:`client_id=${epibox.oauth.client_id}&client_secret=${epibox.oauth.client_secret}&token=${epibox.oauth.token.access_token}`
-    })  
-    localStorage.removeItem('epiboxtoken')
-    delete epibox.oauth
-    epibox.msg('> logged out of session, please make sure all epibox applications are closed','red')
+    }).then(function(){
+        localStorage.removeItem('epiboxtoken')
+        delete epibox.oauth
+        epibox.msg('> logged out of session, please make sure all epibox applications are closed','red')
+    })
+    return res
 }
 
 epibox.refreshToken=async function(){
@@ -106,7 +109,7 @@ epibox.checkToken= async function(){ // check token, refresh if needed
         }
     }
     if(epibox.oauth){
-        epibox.msg(`> oauth session active`)
+        epibox.msg(`> oauth session active,\n initiated at ${new Date(epibox.oauth.token.initiated_at)},\n last refreshed at ${new Date(epibox.oauth.token.created_at)}.`)
     }
 }
 
@@ -121,7 +124,7 @@ epibox.readParms=function(str=location.search){ // by default reads search only,
     //localStorage.epibox=JSON.stringify(epibox.parms)
 }
 
-epibox.msg=function(hm,color="blue",dt=20){
+epibox.msg=function(hm,color="blue",dt=1){ // default is as fast as possible
     console.log(hm)
     let msg = document.getElementById('epibox_msg')
     if(msg){
