@@ -34,6 +34,17 @@ epibox.login=async function(){
             
 }
 
+epibox.logout=async function(){
+    await fetch('https://api.box.com/oauth2/revoke',{
+        method:"POST",
+        mode:"no-cors",
+        body:`client_id=${epibox.oauth.client_id}&client_secret=${epibox.oauth.client_secret}&token=${epibox.oauth.token.access_token}`
+    })  
+    localStorage.removeItem('epiboxtoken')
+    delete epibox.oauth
+    epibox.msg('> logged out of session, please make sure all epibox applications are closed','red')
+}
+
 epibox.refreshToken=async function(){
     epibox.msg('refreshing token ...')
     let token = await (await fetch('https://api.box.com/oauth2/token',{
@@ -46,8 +57,11 @@ epibox.refreshToken=async function(){
     token.client_secret=epibox.oauth.client_secret
     epibox.oauth.token=token
     localStorage.epiboxtoken=JSON.stringify(epibox.oauth.token)
-    const msg = `session refreshed at ${new Date(epibox.oauth.token.created_at)}`
-    epibox.msg(msg)
+    let msg = `> session refreshed at ${new Date(epibox.oauth.token.created_at)}`
+    if(token.error){
+        msg = `> ${token.error} caused by ${token.error_description}`
+        epibox.msg(msg,'red')
+    }else{epibox.msg(msg,'green')}
     return msg
 }
 
