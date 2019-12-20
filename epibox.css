@@ -1,5 +1,12 @@
+:root {
+  --main-bg-color: white;
+}
 
 body {
-    font-family:sans-serif;
-    color:navy
+    font-family: sans-serif;
+    color: navy;
+    background-color: var(--main-bg-color);
+    border: solid;
+    border-color: var(--main-bg-color);
+    border-width: 12;
 }
