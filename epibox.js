@@ -74,7 +74,10 @@ epibox.getOauth=function(uri=location.origin){
 
 epibox.checkToken= async function(){ // check token, refresh if needed
     if(!epibox.oauth){ // this is being used from a non epbox context
-        let token = JSON.parse(localStorage.epiboxtoken)
+        let token=undefined
+        if(localStorage.epiboxtoken){
+            token = JSON.parse(localStorage.epiboxtoken)
+        }     
         if(!token){
             epibox.msg(`> you don't have an active epibox session, please <a href="${location.origin}/epibox" target="_blank">start one here</a>.`,'red')
         }else{
@@ -83,13 +86,13 @@ epibox.checkToken= async function(){ // check token, refresh if needed
                 client_secret:token.client_secret,
                 token:token
             }
-            epibox.msg('> epibox session refreshed at '+Date())
+            if(Date.now()-(epibox.oauth.token.created_at+epibox.oauth.token.expires_in*1000-10000)>0){ // refresh at 10secs before expiration
+                await epibox.refreshToken()
+            }
         }
-            
     }
-    if(Date.now()-(epibox.oauth.token.created_at+epibox.oauth.token.expires_in*1000)>0){
-        epibox.msg('> session extended, bearer token refreshed at '+Date())
-        epibox.refreshToken()
+    if(epibox.oauth){
+        epibox.msg(`> oauth session active`)
     }
 }
 
