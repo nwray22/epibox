@@ -45,6 +45,38 @@ epibox.login=async function(){
             
 }
 
+epibox.loginObservable=async function(){
+    epibox.readParms()
+    epibox.loginObservableDiv=document.createElement('div')
+    if(epibox.parms.code){ // POST dance with code
+        let token=await (await fetch('https://api.box.com/oauth2/token',{
+            method:"POST",
+            body:`grant_type=authorization_code&code=${epibox.parms.code}&client_id=${client_id.value}&client_secret=${client_secret.value}`
+        })).json()
+        epibox.oauth={
+            token:token,
+            client_id:client_id.value,
+            client_secret:client_secret.value
+        }
+        epibox.oauth.token.initiated_at=epibox.oauth.token.created_at=Date.now()
+        epibox.oauth.token.client_id=epibox.oauth.client_id
+        epibox.oauth.token.client_secret=epibox.oauth.client_secret
+        localStorage.epiboxtoken=JSON.stringify(epibox.oauth.token)
+        epibox.msg(`> oauth2 bearer token recorded in localStorage,\n epibox is now available to your observable notebooks`,'green')
+        epibox.loginObservableDiv.innerHTML=`
+            <button onclick="epibox.checkToken()">Check</button>
+            <button onclick="epibox.refreshToken()">Refresh</button>
+            <button onclick="(async function(){await epibox.getUser();epibox.msg(JSON.stringify(epibox.oauth.user,null,3))})()">User</button>
+            <button onclick="epibox.logout()">Logout</button>
+            <button onclick="localStorage.removeItem('epiboxtoken');location.reload()">Restart</button>
+        `
+    }else{
+        epibox.loginObservableDiv.innerHTML=`<a href="https://account.box.com/api/oauth2/authorize?client_id=${client_id.value}&response_type=code&redirect_uri=https://observablehq.com/@episphere/epibox" style="font-size:large;color:blue;background-color:yellow">&nbsp;Login Box&nbsp;</a>`
+    }
+    return epibox.loginObservableDiv
+}
+// <button id="loginBox" onclick="epibox.loginObservable()">Login Box</button>
+
 epibox.logout=async function(){
     let res = fetch('https://api.box.com/oauth2/revoke',{
         method:"POST",
@@ -97,6 +129,7 @@ epibox.getOauth=function(uri=location.origin){
             epibox.msg(`> no auth found for ${location.origin}`,'red')
             //Error(`no auth found for ${location.origin}`)
     }
+    return epibox.oauth
 }
 
 epibox.checkToken= async function(){ // check token, refresh if needed
