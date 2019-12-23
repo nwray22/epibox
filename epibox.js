@@ -29,7 +29,7 @@ epibox.login=async function(){
         }else{
             //delete localStorage.epiboxtoken
             //alert('logged in')
-            epibox.msg(`> logged in session last updated at ${new Date(epibox.oauth.token.created_at)}`,'green')
+            epibox.msg(`> logged in session last updated ${new Date(epibox.oauth.token.created_at)}`,'green')
         }
     }
             
@@ -114,7 +114,7 @@ epibox.checkToken= async function(){ // check token, refresh if needed
     }
     if(epibox.oauth.token.refresh_token){
         epibox.oauth.token.initiated_at=epibox.oauth.token.initiated_at||epibox.oauth.token.created_at
-        epibox.msg(`> oauth session active,\n initiated at ${new Date(epibox.oauth.token.initiated_at)},\n last refreshed at ${new Date(epibox.oauth.token.created_at)}.`)
+        epibox.msg(`> oauth session checked at ${Date()},\n initiated at ${new Date(epibox.oauth.token.initiated_at)},\n last refreshed at ${new Date(epibox.oauth.token.created_at)}.`)
         if(Date.now()-(epibox.oauth.token.created_at+epibox.oauth.token.expires_in*1000-10000)>0){ // refresh at 10secs before expiration
             await epibox.refreshToken()
         }
@@ -135,7 +135,6 @@ epibox.readParms=function(str=location.search){ // by default reads search only,
 }
 
 epibox.msg=function(hm,color="blue",dt=1){ // default is as fast as possible
-    console.log(hm)
     let msg = document.getElementById('epibox_msg')
     if(msg){
         msg.style.color=color
@@ -148,6 +147,8 @@ epibox.msg=function(hm,color="blue",dt=1){ // default is as fast as possible
             i++
             if(i>hm.length){clearInterval(epibox.msg.t)}
         },dt)
+    }else{
+        console.log(hm)
     }
 }
 
@@ -162,4 +163,9 @@ epibox.get=async function(url='https://api.box.com/2.0/users/me'){
 
 epibox.getJSON=async function(url){
     return (await epibox.get()).json()
+}
+
+epibox.getUser=async function(){ //await epibox.getUser()
+    epibox.oauth.user=epibox.oauth.user||(await epibox.getJSON())
+    return epibox.oauth.user
 }
