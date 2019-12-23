@@ -98,19 +98,25 @@ epibox.checkToken= async function(){ // check token, refresh if needed
         if(!token){
             epibox.msg(`> you don't have an active epibox session, please <a href="${location.origin}/epibox" target="_blank">start one here</a>.`,'red')
         }else{
-            epibox.oauth={
-                client_id:token.client_id,
-                client_secret:token.client_secret,
-                token:token
-            }
-            if(Date.now()-(epibox.oauth.token.created_at+epibox.oauth.token.expires_in*1000-10000)>0){ // refresh at 10secs before expiration
-                await epibox.refreshToken()
-            }
+            if(token.refresh_token){
+                epibox.oauth={
+                    client_id:token.client_id,
+                    client_secret:token.client_secret,
+                    token:token
+                }
+                if(Date.now()-(epibox.oauth.token.created_at+epibox.oauth.token.expires_in*1000-10000)>0){ // refresh at 10secs before expiration
+                    await epibox.refreshToken()
+                }
+            }else{
+                epibox.msg('> refresh token missing, internet access disrupted, retry or restart session','red')
+            } 
         }
     }
-    if(epibox.oauth){
+    if(epibox.oauth.token.refresh_token){
         epibox.oauth.token.initiated_at=epibox.oauth.token.initiated_at||epibox.oauth.token.created_at
         epibox.msg(`> oauth session active,\n initiated at ${new Date(epibox.oauth.token.initiated_at)},\n last refreshed at ${new Date(epibox.oauth.token.created_at)}.`)
+    }else{
+        epibox.msg('> refresh token missing, please restart session','red')
     }
 }
 
@@ -140,4 +146,17 @@ epibox.msg=function(hm,color="blue",dt=1){ // default is as fast as possible
             if(i>hm.length){clearInterval(epibox.msg.t)}
         },dt)
     }
+}
+
+epibox.get=async function(url='https://api.box.com/2.0/users/me'){
+    return await fetch(url,{
+        method:'GET',
+        headers: {
+            'Authorization': 'Bearer '+epibox.oauth.token.access_token
+        }
+    })
+}
+
+epibox.getJSON=async function(url){
+    return (await epibox.get()).json()
 }
