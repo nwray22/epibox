@@ -169,3 +169,7 @@ epibox.getUser=async function(){ //await epibox.getUser()
     epibox.oauth.user=epibox.oauth.user||(await epibox.getJSON())
     return epibox.oauth.user
 }
+
+if(typeof(define)!="undefined"){
+    define(epibox)
+}
