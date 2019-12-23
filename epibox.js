@@ -1,10 +1,20 @@
 console.log('epibox.js loaded')
 
+/*
 epibox=async function(){
     console.log(`epibox ini at ${Date()}`)
     epibox.readParms()
     //epibox.getOauth()
     epibox.login()
+}
+*/
+
+epibox={ // initiatization onload at episphere.github.io/epibox
+    ini:async function(){
+        console.log(`epibox ini at ${Date()}`)
+        epibox.readParms()
+        epibox.login()
+    }
 }
 
 epibox.login=async function(){
