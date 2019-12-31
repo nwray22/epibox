@@ -45,6 +45,19 @@ epibox.login=async function(){
             
 }
 
+epibox.readFromObservableToken=function(token){
+    if(!epibox.oauth){epibox.oauth={}}
+    epibox.oauth.token=token
+    if(token.client_id){ // update client identification values in notebook elements client_id and client_secret
+        client_id.value=epibox.oauth.client_id=token.client_id
+        client_secret.value=epibox.oauth.client_secret=token.client_secret
+    }else{
+        epibox.oauth.token.initiated_at=epibox.oauth.token.created_at=Date.now()
+        epibox.oauth.token.client_id=epibox.oauth.client_id=client_id.value
+        epibox.oauth.token.client_secret=epibox.oauth.client_secret=client_secret.value
+    }
+    localStorage.epiboxtoken=JSON.stringify(epibox.oauth.token)
+}
 epibox.loginObservable=async function(){
     epibox.readParms()
     epibox.loginObservableDiv=document.createElement('div')
@@ -53,15 +66,7 @@ epibox.loginObservable=async function(){
             method:"POST",
             body:`grant_type=authorization_code&code=${epibox.parms.code}&client_id=${client_id.value}&client_secret=${client_secret.value}`
         })).json()
-        epibox.oauth={
-            token:token,
-            client_id:client_id.value,
-            client_secret:client_secret.value
-        }
-        epibox.oauth.token.initiated_at=epibox.oauth.token.created_at=Date.now()
-        epibox.oauth.token.client_id=epibox.oauth.client_id
-        epibox.oauth.token.client_secret=epibox.oauth.client_secret
-        localStorage.epiboxtoken=JSON.stringify(epibox.oauth.token)
+        epibox.readFromObservableToken(token)
         epibox.msg(`> oauth2 bearer token recorded in localStorage,\n epibox is now available to your observable notebooks`,'green')
         epibox.loginObservableDiv.innerHTML=`
             <button onclick="epibox.checkToken()">Check</button>
@@ -71,7 +76,21 @@ epibox.loginObservable=async function(){
             <button onclick="localStorage.removeItem('epiboxtoken');location.reload()">Restart</button>
         `
     }else{
-        epibox.loginObservableDiv.innerHTML=`<a href="https://account.box.com/api/oauth2/authorize?client_id=${client_id.value}&response_type=code&redirect_uri=https://observablehq.com/@episphere/epibox" style="font-size:large;color:blue;background-color:yellow">&nbsp;Login Box&nbsp;</a>`
+        if(localStorage.epiboxtoken){ // pre-existing credentials found
+            epibox.readFromObservableToken(JSON.parse(localStorage.epiboxtoken))
+            epibox.loginObservableDiv.innerHTML=`
+                <button onclick="epibox.checkToken()">Check</button>
+                <button onclick="epibox.refreshToken()">Refresh</button>
+                <button onclick="(async function(){await epibox.getUser();epibox.msg(JSON.stringify(epibox.oauth.user,null,3))})()">User</button>
+                <button onclick="epibox.logout()">Logout</button>
+                <button onclick="localStorage.removeItem('epiboxtoken');location.reload()">Restart</button>
+            `
+            // checkToken
+            epibox.checkToken()
+
+        }else{
+            epibox.loginObservableDiv.innerHTML=`<a href="https://account.box.com/api/oauth2/authorize?client_id=${client_id.value}&response_type=code&redirect_uri=https://observablehq.com/@episphere/epibox" style="font-size:large;color:blue;background-color:yellow">&nbsp;Login Box&nbsp;</a>`
+        }
     }
     return epibox.loginObservableDiv
 }
