@@ -117,6 +117,7 @@ epibox.logout=async function(){
 }
 
 epibox.refreshToken=async function(){
+    setTimeout(epibox.checkToken,3000)
     epibox.msg('refreshing token ...')
     let token = await (await fetch('https://api.box.com/oauth2/token',{
         method:"POST",
@@ -167,7 +168,7 @@ epibox.checkToken= async function(){ // check token, refresh if needed
         if(!token){
             let newUrl=document.baseURI
             if(document.baseURI.match(/[\#\?]/g)){newUrl=document.baseURI.slice(0,document.baseURI.indexOf(document.baseURI.match(/[\#\?]/g)[0]))}
-            epibox.msg(`> you don't have an active epibox session, <a href="${newUrl}?newSession" style="color:blue;background-color:yellow;font-size:large">&nbsp;start new session&nbsp;</a>.`,'red')
+            epibox.msg(`> you don't have an active epibox session, <a href="${newUrl}?newSession=${Math.random().toString().slice(2)}" style="color:blue;background-color:yellow;font-size:large">&nbsp;start new session&nbsp;</a>.`,'red')
         }else{
             if(token.refresh_token){
                 epibox.oauth={
