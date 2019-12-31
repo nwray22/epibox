@@ -45,51 +45,58 @@ epibox.login=async function(){
             
 }
 
-epibox.readFromObservableToken=function(token){
+epibox.observableToken=function(token={}){
     if(!epibox.oauth){epibox.oauth={}}
     epibox.oauth.token=token
+    // default client info
+    let client_id_value = 'rq2ab1uuvrzp86oa0yehgjibqf7arxy5'
+    let client_secret_value = 'NItekKKQEqQBgRsU0qnEBVY3zP0nvieh'
+    // update client info from token, if available
     if(token.client_id){ // update client identification values in notebook elements client_id and client_secret
-        client_id.value=epibox.oauth.client_id=token.client_id
-        client_secret.value=epibox.oauth.client_secret=token.client_secret
+        let client_id_value=token.client_id||client_id_value
+        let client_secret_value=token.client_secret||client_secret_value
     }else{
         epibox.oauth.token.initiated_at=epibox.oauth.token.created_at=Date.now()
-        epibox.oauth.token.client_id=epibox.oauth.client_id=client_id.value
-        epibox.oauth.token.client_secret=epibox.oauth.client_secret=client_secret.value
     }
+    epibox.oauth.token.client_id=epibox.oauth.client_id=client_id_value
+    epibox.oauth.token.client_secret=epibox.oauth.client_secret=client_secret_value
     localStorage.epiboxtoken=JSON.stringify(epibox.oauth.token)
+    return epibox.oauth.token
+}
+epibox.activeDivHtml=function(){
+    setTimeout(epibox.checkToken,2000)
+    return `<div id="box_client">
+        <h3>epiBox</h3>
+        client_id:<input id="client_id" value="${epibox.oauth.client_id}"><br>
+        client_secret:<input id="client_secret" value="${epibox.oauth.client_secret}" type="password">
+        <pre id="epibox_msg" style="color:green;background-color:rgb(234,250,241)">active session ...</pre>
+        <button onclick="epibox.checkToken()">Check</button>
+        <button onclick="epibox.refreshToken()">Refresh</button>
+        <button onclick="(async function(){await epibox.getUser();epibox.msg(JSON.stringify(epibox.oauth.user,null,3))})()">User</button>
+        <button onclick="epibox.logout()">Logout</button>
+        <button onclick="epibox.logout();setTimeout(epibox.checkToken,3000)">Restart</button>
+    </div>`
 }
 epibox.loginObservable=async function(){
     epibox.readParms()
     epibox.loginObservableDiv=document.createElement('div')
     if(epibox.parms.code){ // POST dance with code
+        epibox.observableToken()
         let token=await (await fetch('https://api.box.com/oauth2/token',{
             method:"POST",
-            body:`grant_type=authorization_code&code=${epibox.parms.code}&client_id=${client_id.value}&client_secret=${client_secret.value}`
+            body:`grant_type=authorization_code&code=${epibox.parms.code}&client_id=${epibox.oauth.client_id}&client_secret=${epibox.oauth.client_secret}`
         })).json()
-        epibox.readFromObservableToken(token)
+        epibox.observableToken(token)
         epibox.msg(`> oauth2 bearer token recorded in localStorage,\n epibox is now available to your observable notebooks`,'green')
-        epibox.loginObservableDiv.innerHTML=`
-            <button onclick="epibox.checkToken()">Check</button>
-            <button onclick="epibox.refreshToken()">Refresh</button>
-            <button onclick="(async function(){await epibox.getUser();epibox.msg(JSON.stringify(epibox.oauth.user,null,3))})()">User</button>
-            <button onclick="epibox.logout()">Logout</button>
-            <button onclick="localStorage.removeItem('epiboxtoken');location.reload()">Restart</button>
-        `
+        epibox.loginObservableDiv.innerHTML=epibox.activeDivHtml()
     }else{
         if(localStorage.epiboxtoken){ // pre-existing credentials found
-            epibox.readFromObservableToken(JSON.parse(localStorage.epiboxtoken))
-            epibox.loginObservableDiv.innerHTML=`
-                <button onclick="epibox.checkToken()">Check</button>
-                <button onclick="epibox.refreshToken()">Refresh</button>
-                <button onclick="(async function(){await epibox.getUser();epibox.msg(JSON.stringify(epibox.oauth.user,null,3))})()">User</button>
-                <button onclick="epibox.logout()">Logout</button>
-                <button onclick="localStorage.removeItem('epiboxtoken');location.reload()">Restart</button>
-            `
-            // checkToken
-            epibox.checkToken()
-
+            epibox.observableToken(JSON.parse(localStorage.epiboxtoken))
+            epibox.loginObservableDiv.innerHTML=epibox.activeDivHtml()
         }else{
-            epibox.loginObservableDiv.innerHTML=`<a href="https://account.box.com/api/oauth2/authorize?client_id=${client_id.value}&response_type=code&redirect_uri=https://observablehq.com/@episphere/epibox" style="font-size:large;color:blue;background-color:yellow">&nbsp;Login Box&nbsp;</a>`
+            epibox.observableToken()
+            epibox.loginObservableDiv.innerHTML=`<h3>epiBox</h3>
+            <a href="https://account.box.com/api/oauth2/authorize?client_id=${epibox.oauth.client_id}&response_type=code&redirect_uri=https://observablehq.com/@episphere/epibox" style="font-size:large;color:blue;background-color:yellow">&nbsp;Login Box&nbsp;</a>`
         }
     }
     return epibox.loginObservableDiv
@@ -158,7 +165,9 @@ epibox.checkToken= async function(){ // check token, refresh if needed
             token = JSON.parse(localStorage.epiboxtoken)
         }     
         if(!token){
-            epibox.msg(`> you don't have an active epibox session, please <a href="${location.origin}/epibox" target="_blank">start one here</a>.`,'red')
+            let newUrl=document.baseURI
+            if(document.baseURI.match(/[\#\?]/g)){newUrl=document.baseURI.slice(0,document.baseURI.indexOf(document.baseURI.match(/[\#\?]/g)[0]))}
+            epibox.msg(`> you don't have an active epibox session, <a href="${newUrl}?newSession" style="color:blue;background-color:yellow;font-size:large">&nbsp;start new session&nbsp;</a>.`,'red')
         }else{
             if(token.refresh_token){
                 epibox.oauth={
