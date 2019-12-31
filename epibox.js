@@ -168,7 +168,7 @@ epibox.checkToken= async function(){ // check token, refresh if needed
         if(!token){
             let newUrl=document.baseURI
             if(document.baseURI.match(/[\#\?]/g)){newUrl=document.baseURI.slice(0,document.baseURI.indexOf(document.baseURI.match(/[\#\?]/g)[0]))}
-            epibox.msg(`> you don't have an active epibox session, /n<a href="${newUrl}?newSession=${Math.random().toString().slice(2)}" style="color:blue;background-color:yellow;font-size:large">&nbsp;start new session&nbsp;</a>.`,'red')
+            epibox.msg(`> you don't have an active epibox session, \n<a href="${newUrl}?newSession=${Math.random().toString().slice(2)}" style="color:blue;background-color:yellow;font-size:large">&nbsp;start new session&nbsp;</a>.`,'red')
         }else{
             if(token.refresh_token){
                 epibox.oauth={
