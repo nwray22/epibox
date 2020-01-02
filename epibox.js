@@ -20,7 +20,7 @@ epibox={ // initiatization onload at episphere.github.io/epibox
 epibox.login=async function(){
     epibox.getOauth()
     // look for token infoin localStorage
-    if(localStorage.epiboxtoken){epibox.oauth.token=JSON.parse(localStorage.epiboxtoken)} // remove if localStorage persistence undesirable
+    if(localStorage.epiBoxToken){epibox.oauth.token=JSON.parse(localStorage.epiBoxToken)} // remove if localStorage persistence undesirable
     if(epibox.parms.code){ // dance first step taken
         epibox.oauth.token = await (await fetch('https://api.box.com/oauth2/token',{
             method:"POST",
@@ -34,10 +34,10 @@ epibox.login=async function(){
         location.href=`https://account.box.com/api/oauth2/authorize?client_id=${epibox.oauth.client_id}&response_type=code&redirect_uri=${location.origin+location.pathname}`
     }else{ // clean url code
         if(location.search.length>2){
-            localStorage.epiboxtoken=JSON.stringify(epibox.oauth.token)
+            localStorage.epiBoxToken=JSON.stringify(epibox.oauth.token)
             location.href=location.origin+location.pathname
         }else{
-            //delete localStorage.epiboxtoken
+            //delete localStorage.epiBoxToken
             //alert('logged in')
             epibox.msg(`> logged in session last updated ${new Date(epibox.oauth.token.created_at)}`,'green')
         }
@@ -60,7 +60,7 @@ epibox.observableToken=function(token={}){
     }
     epibox.oauth.token.client_id=epibox.oauth.client_id=client_id_value
     epibox.oauth.token.client_secret=epibox.oauth.client_secret=client_secret_value
-    localStorage.epiboxtoken=JSON.stringify(epibox.oauth.token)
+    localStorage.epiBoxToken=JSON.stringify(epibox.oauth.token)
     return epibox.oauth.token
 }
 epibox.activeDivHtml=function(){
@@ -90,8 +90,8 @@ epibox.loginObservable=async function(){
         epibox.msg(`> oauth2 bearer token recorded in localStorage,\n epibox is now available to your observable notebooks`,'green')
         epibox.loginObservableDiv.innerHTML=epibox.activeDivHtml()
     }else{
-        if(localStorage.epiboxtoken){ // pre-existing credentials found
-            epibox.observableToken(JSON.parse(localStorage.epiboxtoken))
+        if(localStorage.epiBoxToken){ // pre-existing credentials found
+            epibox.observableToken(JSON.parse(localStorage.epiBoxToken))
             epibox.loginObservableDiv.innerHTML=epibox.activeDivHtml()
         }else{
             epibox.observableToken()
@@ -109,7 +109,7 @@ epibox.logout=async function(){
         mode:"no-cors",
         body:`client_id=${epibox.oauth.client_id}&client_secret=${epibox.oauth.client_secret}&token=${epibox.oauth.token.access_token}`
     }).then(function(){
-        localStorage.removeItem('epiboxtoken')
+        localStorage.removeItem('epiBoxToken')
         delete epibox.oauth
         epibox.msg('> logged out of session, please make sure all epibox applications are closed','red')
     })
@@ -128,7 +128,7 @@ epibox.refreshToken=async function(){
     token.client_id=epibox.oauth.client_id
     token.client_secret=epibox.oauth.client_secret
     epibox.oauth.token=token
-    localStorage.epiboxtoken=JSON.stringify(epibox.oauth.token)
+    localStorage.epiBoxToken=JSON.stringify(epibox.oauth.token)
     let msg = `> session refreshed at ${new Date(epibox.oauth.token.created_at)}`
     if(token.error){
         msg = `> ${token.error} caused by ${token.error_description}`
@@ -162,8 +162,8 @@ epibox.getOauth=function(uri=location.origin){
 epibox.checkToken= async function(){ // check token, refresh if needed
     if(!epibox.oauth){ // this is being used from a non epbox context
         let token=undefined
-        if(localStorage.epiboxtoken){
-            token = JSON.parse(localStorage.epiboxtoken)
+        if(localStorage.epiBoxToken){
+            token = JSON.parse(localStorage.epiBoxToken)
         }     
         if(!token){
             let newUrl=document.baseURI
