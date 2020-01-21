@@ -167,8 +167,13 @@ epibox.checkToken= async function(){ // check token, refresh if needed
         }     
         if(!token){
             let newUrl=document.baseURI
-            if(document.baseURI.match(/[\#\?]/g)){newUrl=document.baseURI.slice(0,document.baseURI.indexOf(document.baseURI.match(/[\#\?]/g)[0]))}
-            epibox.msg(`> you don't have an active epibox session, \n<a href="${newUrl}?newSession=${Math.random().toString().slice(2)}" style="color:blue;background-color:yellow;font-size:large">&nbsp;start new session&nbsp;</a>.`,'red')
+            if(location.pathname=='/epibox/'){
+                if(document.baseURI.match(/[\#\?]/g)){newUrl=document.baseURI.slice(0,document.baseURI.indexOf(document.baseURI.match(/[\#\?]/g)[0]))}
+                epibox.msg(`> you don't have an active epibox session, \n<a href="${newUrl}?newSession=${Math.random().toString().slice(2)}" style="color:blue;background-color:yellow;font-size:large">&nbsp;start new session&nbsp;</a>.`,'red')
+            }else{
+                epibox.msg(`> you don't have an active epibox session, \n<a href="${location.origin+'/epibox'}" style="color:blue;background-color:yellow;font-size:large" target="_blank">&nbsp;start new session&nbsp;</a>.`,'red')
+            }
+                
         }else{
             if(token.refresh_token){
                 epibox.oauth={
@@ -234,7 +239,11 @@ epibox.get=async function(url='https://api.box.com/2.0/users/me'){
 }
 
 epibox.getJSON=async function(url){
-    return (await epibox.get()).json()
+    return (await epibox.get(url)).json()
+}
+
+epibox.getText=async function(url){
+    return (await epibox.get(url)).text()
 }
 
 epibox.getUser=async function(){ //await epibox.getUser()
