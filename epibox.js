@@ -24,7 +24,10 @@ epibox.login=async function(){
     if(epibox.parms.code){ // dance first step taken
         epibox.oauth.token = await (await fetch('https://api.box.com/oauth2/token',{
             method:"POST",
-            body:`grant_type=authorization_code&code=${epibox.parms.code}&client_id=${epibox.oauth.client_id}&client_secret=${epibox.oauth.client_secret}`
+            body:`grant_type=authorization_code&code=${epibox.parms.code}&client_id=${epibox.oauth.client_id}&client_secret=${epibox.oauth.client_secret}`,
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            }
         })).json()
         epibox.oauth.token.initiated_at=epibox.oauth.token.created_at=Date.now()
         epibox.oauth.token.client_id=epibox.oauth.client_id
