@@ -124,6 +124,9 @@ epibox.refreshToken=async function(){
     epibox.msg('refreshing token ...')
     let token = await (await fetch('https://api.box.com/oauth2/token',{
         method:"POST",
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
         body:`grant_type=refresh_token&refresh_token=${epibox.oauth.token.refresh_token}&client_id=${epibox.oauth.client_id}&client_secret=${epibox.oauth.client_secret}`
     })).json()
     token.created_at=Date.now()
