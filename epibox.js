@@ -87,6 +87,9 @@ epibox.loginObservable=async function(){
         epibox.observableToken()
         let token=await (await fetch('https://api.box.com/oauth2/token',{
             method:"POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
             body:`grant_type=authorization_code&code=${epibox.parms.code}&client_id=${epibox.oauth.client_id}&client_secret=${epibox.oauth.client_secret}`
         })).json()
         epibox.observableToken(token)
@@ -110,6 +113,9 @@ epibox.logout=async function(){
     let res = fetch('https://api.box.com/oauth2/revoke',{
         method:"POST",
         mode:"no-cors",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
         body:`client_id=${epibox.oauth.client_id}&client_secret=${epibox.oauth.client_secret}&token=${epibox.oauth.token.access_token}`
     }).then(function(){
         localStorage.removeItem('epiBoxToken')
