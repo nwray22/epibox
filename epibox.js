@@ -287,7 +287,7 @@ epibox.saveFile=(x,fileName)=>{ // x is the content of the file
 
 epibox.downloadCredentials=_=>{
     let tk = JSON.parse(localStorage.epiBoxToken)
-    let txt = `client_id client_secret refresh_token\n${tk.client_id},${tk.client_secret},${tk.refresh_token}`
+    let txt = `client_id,client_secret,refresh_token\n${tk.client_id},${tk.client_secret},${tk.refresh_token}`
     epibox.saveFile(txt,"ebiboxCredentials.csv")
     //debugger
 }
