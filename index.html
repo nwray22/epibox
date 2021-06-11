@@ -9,7 +9,7 @@
 <button onclick="(async function(){await epibox.getUser();epibox.msg(JSON.stringify(epibox.oauth.user,null,3))})()">User</button>
 <button onclick="epibox.logout()">Logout</button>
 <button onclick="localStorage.removeItem('epiboxtoken');location.reload()">Restart</button>
-<button onclick="epibox.downloadCredentials()">Download Credentials<br><span style="color:red;background-color:yellow;font-size:small">Careful with this one!</span></button>
+<button onclick="epibox.downloadCredentials()">Download Credentials<br><b style="color:red;background-color:yellow;font-size:small">Careful with this file!</b></button>
 <hr>
 <p style="font-size:small;color:gray">If you were sent to this page from an epiSphere application, please return to the parent page after logging in here. You can close the page, the session will be managed directly from the application.</p>
 </body>

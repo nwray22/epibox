@@ -77,7 +77,8 @@ epibox.activeDivHtml=function(){
         <button onclick="epibox.refreshToken()">Refresh</button>
         <button onclick="(async function(){await epibox.getUser();epibox.msg(JSON.stringify(epibox.oauth.user,null,3))})()">User</button>
         <button onclick="epibox.logout()">Logout</button>
-        <button onclick="epibox.logout();setTimeout(epibox.checkToken,3000)">Restart !</button>       
+        <button onclick="epibox.logout();setTimeout(epibox.checkToken,3000)">Restart !</button>
+        <button onclick="epibox.downloadCredentials()">Download Credentials<br><b style="color:red;background-color:yellow;font-size:small">Careful with this file!</b></button>
     </div>`
 }
 epibox.loginObservable=async function(){
