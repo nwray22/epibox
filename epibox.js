@@ -265,8 +265,16 @@ epibox.getText=async function(url){
 }
 
 epibox.getUser=async function(){ //await epibox.getUser()
-    epibox.oauth.user=epibox.oauth.user||(await epibox.getJSON())
-    return epibox.oauth.user
+    if(epibox.oauth){
+    	epibox.oauth.user=epibox.oauth.user||(await epibox.getJSON())
+    	return epibox.oauth.user
+    }else{
+    	console.log('no oauth found')
+    	epibox.checkToken()
+    	return 'no oauth found'
+    }
+    
+    
 }
 
 epibox.saveFile=(x,fileName)=>{ // x is the content of the file

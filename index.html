@@ -6,7 +6,7 @@
 <button onclick="epibox.login()">Login</button>
 <button onclick="epibox.checkToken()">Check</button>
 <button onclick="epibox.refreshToken()">Refresh</button>
-<button onclick="(async function(){await epibox.getUser();epibox.msg(JSON.stringify(epibox.oauth.user,null,3))})()">User</button>
+<button onclick="(async function(){await epibox.getUser();if(epibox.oauth){epibox.msg(JSON.stringify(epibox.oauth.user,null,3))}})()">User</button>
 <button onclick="epibox.logout()">Logout</button>
 <button onclick="localStorage.removeItem('epiboxtoken');location.reload()">Restart</button>
 <button onclick="epibox.downloadCredentials()">Download Credentials<br><b style="color:red;background-color:yellow;font-size:small">Careful with this file!</b></button>
