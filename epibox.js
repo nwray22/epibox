@@ -272,7 +272,14 @@ epibox.get=async function(url='https://api.box.com/2.0/users/me'){
 			}
 		})
     }else{
-    	return 'not logged in'
+    	const fun = new Promise((resolve, reject) => {
+		  setTimeout(async() => {
+		  	let res = await epibox.get(url)
+			resolve(res);
+		  }, 3000);
+		});
+    	return await fun
+    	//return 'not logged in'
     }
     
 }
