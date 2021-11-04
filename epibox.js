@@ -70,20 +70,34 @@ epibox.activeDivHtml=function(){
     setTimeout(epibox.checkToken,2000)
     return `<div id="box_client">
         <h3>epiBox</h3>
+        <!--
         client_id:<input id="client_id" value="${epibox.oauth.client_id}"><br>
         client_secret:<input id="client_secret" value="${epibox.oauth.client_secret}" type="password">
+        -->
         <pre id="epibox_msg" style="color:green;background-color:rgb(234,250,241)">active session ...</pre>
         <button onclick="epibox.checkToken()">Check</button>
         <button onclick="epibox.refreshToken()">Refresh</button>
         <button onclick="(async function(){await epibox.getUser();epibox.msg(JSON.stringify(epibox.oauth.user,null,3))})()">User</button>
-        <button onclick="epibox.logout()">Logout</button>
+        <button onclick="epibox.logout();epibox.clearLog()">Logout</button>
+        <!--
         <button onclick="epibox.logout();setTimeout(epibox.checkToken,3000)">Restart !</button>
         <button onclick="epibox.downloadCredentials()">Download Credentials<br><b style="color:red;background-color:yellow;font-size:small">Careful with this file!</b></button>
+        -->
     </div>`
 }
 epibox.loginObservable=async function(){
     epibox.readParms()
     epibox.loginObservableDiv=document.createElement('div')
+    epibox.clearLog=function(){ // reload page without parameters
+    	setTimeout(function(){
+        	a = document.createElement('a')
+        	a.href=`https://observablehq.com${new URL(document.baseURI).pathname}`
+        	//a.innerHTML='clickme'
+        	epibox.loginObservableDiv.appendChild(a)
+        	setTimeout(function(){a.click()},1000)
+        	//debugger
+        },3000)
+    }
     if(epibox.parms.code){ // POST dance with code
         epibox.observableToken()
         let token=await (await fetch('https://api.box.com/oauth2/token',{
@@ -96,6 +110,8 @@ epibox.loginObservable=async function(){
         epibox.observableToken(token)
         epibox.msg(`> oauth2 bearer token recorded in localStorage,\n epibox is now available to your observable notebooks`,'green')
         epibox.loginObservableDiv.innerHTML=epibox.activeDivHtml()
+        epibox.clearLog()
+        // clear code parm
     }else{
         if(localStorage.epiBoxToken){ // pre-existing credentials found
             epibox.observableToken(JSON.parse(localStorage.epiBoxToken))
@@ -248,16 +264,21 @@ epibox.msg=function(hm,color="blue",dt=1){ // default is as fast as possible
 }
 
 epibox.get=async function(url='https://api.box.com/2.0/users/me'){
-    return await fetch(url,{
-        method:'GET',
-        headers: {
-            'Authorization': 'Bearer '+epibox.oauth.token.access_token
-        }
-    })
+    if(epibox.oauth){
+    	return await fetch(url,{
+			method:'GET',
+			headers: {
+				'Authorization': 'Bearer '+epibox.oauth.token.access_token
+			}
+		})
+    }else{
+    	return 'not logged in'
+    }
+    
 }
 
 epibox.getJSON=async function(url){
-    return (await epibox.get(url)).json()
+	return (await epibox.get(url)).json()
 }
 
 epibox.getText=async function(url){
