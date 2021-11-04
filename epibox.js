@@ -69,7 +69,7 @@ epibox.observableToken=function(token={}){
 epibox.activeDivHtml=function(){
     setTimeout(epibox.checkToken,2000)
     return `<div id="box_client">
-        <h3>epiBox</h3>
+        <h3>epiBox Connect</h3>
         <!--
         client_id:<input id="client_id" value="${epibox.oauth.client_id}"><br>
         client_secret:<input id="client_secret" value="${epibox.oauth.client_secret}" type="password">
@@ -83,6 +83,7 @@ epibox.activeDivHtml=function(){
         <button onclick="epibox.logout();setTimeout(epibox.checkToken,3000)">Restart !</button>
         <button onclick="epibox.downloadCredentials()">Download Credentials<br><b style="color:red;background-color:yellow;font-size:small">Careful with this file!</b></button>
         -->
+        <hr>
     </div>`
 }
 epibox.loginObservable=async function(){
