@@ -120,7 +120,9 @@ epibox.loginObservable=async function(){
         }else{
             epibox.observableToken()
             epibox.loginObservableDiv.innerHTML=`<h3>epiBox</h3>
-            <button onclick="epibox.setURL('https://account.box.com/api/oauth2/authorize?client_id=${epibox.oauth.client_id}&response_type=code&redirect_uri=https://observablehq.com/@episphere/epibox')" style="background-color:yellow">Login Box</button>`
+            <p>
+            <button onclick="epibox.setURL('https://account.box.com/api/oauth2/authorize?client_id=${epibox.oauth.client_id}&response_type=code&redirect_uri=https://observablehq.com/@episphere/epibox')" style="background-color:yellow">Login Box</button>
+            </p>&nbsp;`
         }
     }
     return epibox.loginObservableDiv
