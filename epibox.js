@@ -120,12 +120,18 @@ epibox.loginObservable=async function(){
         }else{
             epibox.observableToken()
             epibox.loginObservableDiv.innerHTML=`<h3>epiBox</h3>
-            <a href="https://account.box.com/api/oauth2/authorize?client_id=${epibox.oauth.client_id}&response_type=code&redirect_uri=https://observablehq.com/@episphere/epibox" style="font-size:large;color:blue;background-color:yellow">&nbsp;Login Box&nbsp;</a>`
+            <button onclick="epibox.setURL('https://account.box.com/api/oauth2/authorize?client_id=${epibox.oauth.client_id}&response_type=code&redirect_uri=https://observablehq.com/@episphere/epibox')" style="background-color:yellow">Login Box</button>`
         }
     }
     return epibox.loginObservableDiv
 }
 // <button id="loginBox" onclick="epibox.loginObservable()">Login Box</button>
+
+epibox.setURL=function(url){
+	let a = document.createElement('a')
+    a.href=url
+    a.click()
+}
 
 epibox.logout=async function(){
     let res = fetch('https://api.box.com/oauth2/revoke',{
