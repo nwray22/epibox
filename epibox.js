@@ -184,7 +184,7 @@ epibox.refreshToken = async function () {
     epibox.refreshTokenBeforeExpiry = setTimeout(() => {
         console.log("REFRESH SUCCESSFUL")
         epibox.refreshToken()
-    }, (expires_in - (2*60)) * 1000) // Buffer of 2 minutes before expiry
+    }, (token.expires_in - (2*60)) * 1000) // Buffer of 2 minutes before expiry
 
     let msg = `> session refreshed at ${new Date(epibox.oauth.token.created_at)}`
     if (token.error) {
