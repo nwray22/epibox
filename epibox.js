@@ -62,8 +62,8 @@ epibox.observableToken = function (token = {}) {
     if (!epibox.oauth) { epibox.oauth = {} }
     epibox.oauth.token = token
     // default client info
-    let client_id_value = 'zf023du1nwsm6h8pmqs6oyn9c72kk9kf'
-    let client_secret_value = '8V6DoKy8yZTuh942CKyyQawSvh8NC19y'
+    let client_id_value = '52zad6jrv5v52mn1hfy1vsjtr9jn5o1w'
+    let client_secret_value = '2rHTqzJumz8s9bAjmKMV83WHX1ooN4kT'
     // update client info from token, if available
     if (token.client_id) { // update client identification values in notebook elements client_id and client_secret
         let client_id_value = token.client_id || client_id_value
