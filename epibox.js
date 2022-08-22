@@ -205,8 +205,8 @@ epibox.getOauth = function (uri = location.origin) {
             break
         case 'https://episphere.github.io':
             epibox.oauth = {
-                client_id: '1n44fu5yu1l547f2n2fgcw7vhps7kvuw',
-                client_secret: '2ZYzmHXGyzBcjZ9d1Ttsc1d258LiGGVd'
+                client_id: 'zf023du1nwsm6h8pmqs6oyn9c72kk9kf',
+                client_secret: '8V6DoKy8yZTuh942CKyyQawSvh8NC19y'
             }
             break
         default:
