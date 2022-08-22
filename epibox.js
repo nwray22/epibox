@@ -199,8 +199,8 @@ epibox.getOauth = function (uri = location.origin) {
     switch (uri) {
         case 'http://localhost:8000':
             epibox.oauth = {
-                client_id: '52zad6jrv5v52mn1hfy1vsjtr9jn5o1w',
-                client_secret: '2rHTqzJumz8s9bAjmKMV83WHX1ooN4kT'
+                client_id: 'zf023du1nwsm6h8pmqs6oyn9c72kk9kf',
+                client_secret: '8V6DoKy8yZTuh942CKyyQawSvh8NC19y'
             }
             break
         case 'https://episphere.github.io':
